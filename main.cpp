@@ -1,5 +1,4 @@
 #include <iostream>
-#include "JsonParse.cpp"
 #include "mainFunctions.cpp"
 #include <ctype.h>
 #include <iostream>
@@ -32,27 +31,47 @@ std::vector<std::string> splitString(std::string s, std::string splitter = " "){
         arr.push_back(token);
         s.erase(0, pos + delimiter.length());
     }
-    if(arr.size() ==0) {
-        arr.push_back(s);
-    }
+    arr.push_back(s);
     return arr;
 }
 
 
 int main(){
-    
-    std::ifstream file; 
+
+    // std::ifstream file; 
     //myfile.open("shopping_list.txt");
+    
     std::string cmd;
     while(true){
-    std::cout << "> "; std::getline(std::cin, cmd);
+    std::cout << "> "; 
+    std::getline(std::cin, cmd);
     std::vector<std::string> cmdSplit = splitString(cmd);
     if(cmdSplit.size() <=0) {continue;}
         switch(conversionCmd(cmdSplit[0])){
 
             case ehelp:
-                help();
+                help(); 
                 break;
+            case eopen:
+                if(cmdSplit.size() != 2 ){
+                    Messanger::LogError("This function takes one argument");
+                    break;
+                }
+                open(cmdSplit[1]);
+                break;
+            case esave:
+                save();
+                break;
+            case esaveas:
+                if(cmdSplit.size() != 2 ){
+                    Messanger::LogError("This function takes only one argument");
+                    break;
+                }
+                saveAs(cmdSplit[1]);
+                break;
+            case eclose:
+                close();
+            break;
             case eexit:
                 exit();
                 return 0;

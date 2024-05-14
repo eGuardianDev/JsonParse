@@ -2,7 +2,13 @@
 
 #### Todo:
 - [ ] Main functionality
+    - [ ] opening files
+    - [ ] saving data
+    - [ ] manipulating data
+    - [ ] display data in good way
 - [ ] Unit testing
+    - [ ] save data
+    - [ ] manipulation
 - [ ] Examples
 - [ ] Documentation
 
