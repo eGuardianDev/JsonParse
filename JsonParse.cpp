@@ -130,11 +130,12 @@ class JsonParser{ //privessly called datasave
         bool inValue = false;
         bool inKey = false;
         std::vector<char> brackets;
-        auto display = [] (std::string &k, std::string &v, int place = -1){
+        bool display = [] (std::string &k, std::string &v, int place = -1){
             if(place>=0) std::cout <<place << " ";
             std::cout << k<< ":" << v << std::endl;
             k = "";
             v = "";
+            return true;
         };
         int line = 1;
         for(int i =0;i<data.size();i++){

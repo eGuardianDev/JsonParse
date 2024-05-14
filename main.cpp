@@ -44,6 +44,7 @@ int main(){
     
     std::string cmd;
     while(true){
+
     std::cout << "\x1B[96m"<<ds.getFileName()<<"\033[0m" <<"> "; 
     std::getline(std::cin, cmd);
     std::vector<std::string> cmdSplit = splitString(cmd);

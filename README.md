@@ -3,19 +3,24 @@
 #### Todo:
 - [ ] Main functionality
     - [x] opening files
-    - [ ] saving data
+    - [ ] validation
+    - [ ] saving data in tree
     - [ ] manipulating data
     - [ ] display data in good way
-    - [ ] fix the file system to name with spaces
-    - [ ] rewrite error messages to be outside the library
 - [ ] Unit testing
     - [ ] save data
     - [ ] manipulation
 - [ ] Examples
 - [ ] Documentation
 
+simple fixes:
+- [ ] fix the file system to name with spaces
+- [ ] rewrite error messages to be outside the library
+
 #### Notes:
 - files needed to be reopened if changed
+- Current data display kinda works, but need validator
+- Validator needs to check 2 things - if key-value is correct, brackets.
 
 
 
