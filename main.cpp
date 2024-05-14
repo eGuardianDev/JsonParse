@@ -16,6 +16,7 @@ int conversionCmd(std::string str){
     if(str == "saveas") return esaveas;
     if(str == "close") return eclose;
     if(str == "exit") return eexit;
+    if(str == "data") return edata;
     return -1;
 }
 // implementation https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
@@ -43,7 +44,7 @@ int main(){
     
     std::string cmd;
     while(true){
-    std::cout << "> "; 
+    std::cout << "\x1B[96m"<<ds.getFileName()<<"\033[0m" <<"> "; 
     std::getline(std::cin, cmd);
     std::vector<std::string> cmdSplit = splitString(cmd);
     if(cmdSplit.size() <=0) {continue;}
@@ -52,6 +53,9 @@ int main(){
             case ehelp:
                 help(); 
                 break;
+            case edata:
+                _displayData();
+            break;
             case eopen:
                 if(cmdSplit.size() != 2 ){
                     Messanger::LogError("This function takes one argument");

@@ -1,7 +1,7 @@
 
 
 #include <iostream>
-
+//read 
 void* returnVoidPointer() {
     int* ptr = new int(10);
     return static_cast<void*>(ptr);
