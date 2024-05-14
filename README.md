@@ -2,7 +2,7 @@
 
 #### Todo:
 - [ ] Main functionality
-    - [ ] opening files
+    - [x] opening files
     - [ ] saving data
     - [ ] manipulating data
     - [ ] display data in good way
