@@ -22,6 +22,9 @@ simple fixes:
 - files needed to be reopened if changed
 - Current data display kinda works, but need validator
 - Validator needs to check 2 things - if key-value is correct, brackets.
+- Concepts/test4.cpp - the tree memory system
+- Concepts/test2.cpp - void casting 
+
 
 
 
