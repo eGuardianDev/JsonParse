@@ -10,37 +10,36 @@
 
 // implementation https://chatgpt.com/c/46e9dfad-e87f-4be2-9349-159e96d2c068
 
-class JsonObject{
+class DefaultJsonObject{
     public:
-    bool is_array = false;
     virtual void* getData() = 0;
-    int to_int(JsonObject *jsonObject){
+    int to_int(DefaultJsonObject *jsonObject){
         int* data =  static_cast<int*>(jsonObject->getData());
         return *data;
     }
-    std::string to_string(JsonObject *jsonObject){
+    std::string to_string(DefaultJsonObject *jsonObject){
 
         std::string* data =  static_cast<std::string*>(jsonObject->getData());
         return *data;
     }
-    JsonObject* to_object(JsonObject *jsonObject){
+    DefaultJsonObject* to_object(DefaultJsonObject *jsonObject){
 
-        JsonObject* data =  static_cast<JsonObject*>(jsonObject->getData());
+        DefaultJsonObject* data =  static_cast<DefaultJsonObject*>(jsonObject->getData());
         return data;
     }
 };
-class JsonObjectInt: public JsonObject{
+class JsonObjectNumber: public DefaultJsonObject{
 
     int value = 0;
     public:
-    JsonObjectInt(int value){
+    JsonObjectNumber(int value){
         this->value = value;
     }
     void* getData() override{
         return static_cast<void*>(&value);
     }
 };
-class JsonObjectString: public JsonObject{
+class JsonObjectString: public DefaultJsonObject{
 
     std::string value = "";
     public:
@@ -51,11 +50,11 @@ class JsonObjectString: public JsonObject{
         return static_cast<void*>(&value);
     }
 };
-class JsonObjectNode: public JsonObject{
+class JsonObjectArray: public DefaultJsonObject{
 
-    JsonObject *value;
+    DefaultJsonObject *value;
     public:
-    JsonObjectNode(JsonObject *value){
+    JsonObjectArray(DefaultJsonObject *value){
         this->value = value;
     }
     void* getData() override{
@@ -114,15 +113,69 @@ class JsonParser{ //privessly called datasave
         return 0;
     }
 
-    int validateJson(){
-        for(int i =0;i<data.size();i++){
+    //can start as object, 1 value, array
+
+
+
+    //object
+    //array
+    //value
+    //string
+    //number
+    //whitespace
+    bool ValidateJson(){
+        bool inObject;
+        bool inArray;
+        bool inValue;
+        bool inKey;
+        std::string key;
+        std::string value;
+        int line = 1;
+        for(int i =0;i<data.size();i ++){
+            switch(data[i]){
+                case '\n':
+                    line++;
+                break;
+                case '{':
+                    //new object
+                break;
+                case '}':
+                    // return from object
+                break;
+                case '"':
+                    //entering string
+                break;
+                case ':':
+                    //entering value;
+                break;
+                case ',':
+                    //new key if in object
+                    //new value if in array
+                break;
+
+                case '[':
+                    //enetring array
+                break;
+                case ']':
+                    //leaving array;
+                break;
+            
+                default:
+                if(inKey){
+                    key += data[i];
+                }
+                if(inValue){
+                    value += data[i];
+                }
+                
+                break;
+                
+            }
+
             
         }
-        
-        
-        return 0;
+        return true;
     }
-
     int GenerateDataTree(){
         
         std::string key;
@@ -130,12 +183,11 @@ class JsonParser{ //privessly called datasave
         bool inValue = false;
         bool inKey = false;
         std::vector<char> brackets;
-        bool display = [] (std::string &k, std::string &v, int place = -1){
+        auto display = [] (std::string &k, std::string &v, int place = -1){
             if(place>=0) std::cout <<place << " ";
             std::cout << k<< ":" << v << std::endl;
             k = "";
             v = "";
-            return true;
         };
         int line = 1;
         for(int i =0;i<data.size();i++){
@@ -234,9 +286,9 @@ class JsonParser{ //privessly called datasave
     }
     int displayData(){
         // std::cout << data <<std::endl;
-        GenerateDataTree();
+        //GenerateDataTree();
        // validateJson();
-        
+        ValidateJson();
         return 0;
     }
 
