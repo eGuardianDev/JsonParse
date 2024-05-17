@@ -96,8 +96,8 @@ class JsonParser{ //privessly called datasave
     std::string data;
     std::string fileName;
 
-    JsonObject *mainNode;
-    JsonObject **currentNode;
+    DefaultJsonObject *mainNode;
+    DefaultJsonObject **currentNode;
 
     int LoadFile(){
         currentNode = &mainNode;

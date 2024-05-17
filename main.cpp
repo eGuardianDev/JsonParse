@@ -2,7 +2,6 @@
 #include "mainFunctions.cpp"
 #include <ctype.h>
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
 //inspired https://stackoverflow.com/questions/650162/why-cant-the-switch-statement-be-applied-to-strings
