@@ -137,6 +137,7 @@ class JsonParser{ //privessly called datasave
                     line++;
                 break;
                 case '{':
+                    
                     //new object
                 break;
                 case '}':

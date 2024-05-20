@@ -39,20 +39,20 @@ simple fixes:
 
 https://stackoverflow.com/questions/556277/trim-remove-a-tab-t-from-a-string
 
-
 https://stackoverflow.com/questions/46535422/c-copying-another-file
-
 
 https://stackoverflow.com/questions/4053837/colorizing-text-in-the-console-with-c
 
-
 https://stackoverflow.com/questions/53359727/how-to-save-and-also-read-c-fstream-file-without-closing-it  
 
+~~https://chatgpt.com/c/46e9dfad-e87f-4be2-9349-159e96d2c068~~
+check [*Concepts/test2.cpp*](Concepts/test2.cpp)
 
-https://chatgpt.com/c/46e9dfad-e87f-4be2-9349-159e96d2c068
 
 https://stackoverflow.com/questions/4053837/colorizing-text-in-the-console-with-c
 
 https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
 
 https://stackoverflow.com/questions/650162/why-cant-the-switch-statement-be-applied-to-strings
+
+https://stackoverflow.com/questions/307765/how-do-i-check-if-an-objects-type-is-a-particular-subclass-in-c
