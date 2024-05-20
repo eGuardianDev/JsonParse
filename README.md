@@ -3,12 +3,14 @@
 #### Todo:
 - [ ] Main functionality
     - [x] opening files
-    - [ ] fix tree data passing for array ( getData() )
-    - [ ] validation
-    - [ ] saving data in tree
+    - [X] fix tree data passing for array ( getData() )
+    - [ ] Implement data input
+      - [ ] validation
+      - [ ] saving data in tree
     - [ ] manipulating data
-    - [ ] display data in good way
+    - [ ] display data in good way "pretty"
 - [ ] Unit testing
+    - [X] Check out library
     - [ ] save data
     - [ ] manipulation
 - [ ] Examples
@@ -45,7 +47,7 @@ https://stackoverflow.com/questions/4053837/colorizing-text-in-the-console-with-
 
 https://stackoverflow.com/questions/53359727/how-to-save-and-also-read-c-fstream-file-without-closing-it  
 
-~~https://chatgpt.com/c/46e9dfad-e87f-4be2-9349-159e96d2c068~~
+~~https://chatgpt.com/c/46e9dfad-e87f-4be2-9349-159e96d2c068~~  
 check [*Concepts/test2.cpp*](Concepts/test2.cpp)
 
 
