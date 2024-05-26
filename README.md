@@ -3,7 +3,7 @@
 #### Todo:
 - [ ] Main functionality
     - [x] opening files
-    - [ ] fix tree data passing for array ( getData() )
+    - [X] fix tree data passing for array ( getData() )
     - [ ] validation
     - [ ] saving data in tree
     - [ ] manipulating data

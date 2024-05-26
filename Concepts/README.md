@@ -15,6 +15,10 @@ best implementation of the class -> To be implemented...
 #### test5.cpp
 Attempt of rewriting the system with tempaltes -> fail
 
+#### test6.cpp
+Display information of tree
+
+
 #### testdoc.cpp
 Attempt at understanding "doctest.h" library
 Immediatly implemented in test4.cpp
