@@ -54,11 +54,15 @@ int main(){
                 help(); 
                 break;
             case edata:
-                _displayData();
+                if(_displayData()== true){
+                    Messenger::LogInfo("Current data is", "\033[1;32mvalid\033[m");
+                }else{
+                    Messenger::LogInfo("Current data is", "\033[1;31minvalid\033[m");
+                }
             break;
             case eopen:
                 if(cmdSplit.size() != 2 ){
-                    Messanger::LogError("This function takes one argument");
+                    Messenger::LogError("This function takes one argument");
                     break;
                 }
                 open(cmdSplit[1]);
@@ -68,7 +72,7 @@ int main(){
                 break;
             case esaveas:
                 if(cmdSplit.size() != 2 ){
-                    Messanger::LogError("This function takes only one argument");
+                    Messenger::LogError("This function takes only one argument");
                     break;
                 }
                 saveAs(cmdSplit[1]);

@@ -1,4 +1,6 @@
-#include "t.h"
+#include "JsonObjects.h"
+
+
 
 ValueType TypeOfValue(Values* val){
     if(dynamic_cast<vString*>(val) != nullptr) return eString;
@@ -6,6 +8,12 @@ ValueType TypeOfValue(Values* val){
     if(dynamic_cast<vObject*>(val) != nullptr) return eObject;
     if(dynamic_cast<vArray*>(val) != nullptr) return eArray;
     if(dynamic_cast<vBoolean*>(val) != nullptr) return eBoolean;
+    return notFound;
+}
+
+ValueType TypeOfObject(Objects* obj){
+    if(dynamic_cast<jsonObject*>(obj) != nullptr) return eObject;
+    if(dynamic_cast<jsonArray*>(obj) != nullptr) return eArray;
     return notFound;
 }
 

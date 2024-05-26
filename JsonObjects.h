@@ -11,6 +11,7 @@
 
 class Values : public Rooter{
     public:
+    Values() {};
     virtual Values* Clone() = 0;
     virtual int setData(void*) =0 ;
     virtual int removeData(unsigned int) = 0;
@@ -102,7 +103,8 @@ enum ValueType{
     notFound = -1
 };
 
-
+ValueType TypeOfValue(Values* val);
+ValueType TypeOfObject(Objects* obj);
 class vObject : public Values{
     protected:
     jsonObject *value;

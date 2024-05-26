@@ -1,3 +1,4 @@
+#include "JsonObjects.h"
 #pragma one
 #include <sstream>
 #include <fstream>
@@ -7,66 +8,10 @@
 #include <algorithm>
 
 #include <vector>
-
-// implementation https://chatgpt.com/c/46e9dfad-e87f-4be2-9349-159e96d2c068
-
-class DefaultJsonObject{
-    public:
-    virtual void* getData() = 0;
-    int to_int(DefaultJsonObject *jsonObject){
-        int* data =  static_cast<int*>(jsonObject->getData());
-        return *data;
-    }
-    std::string to_string(DefaultJsonObject *jsonObject){
-
-        std::string* data =  static_cast<std::string*>(jsonObject->getData());
-        return *data;
-    }
-    DefaultJsonObject* to_object(DefaultJsonObject *jsonObject){
-
-        DefaultJsonObject* data =  static_cast<DefaultJsonObject*>(jsonObject->getData());
-        return data;
-    }
-};
-class JsonObjectNumber: public DefaultJsonObject{
-
-    int value = 0;
-    public:
-    JsonObjectNumber(int value){
-        this->value = value;
-    }
-    void* getData() override{
-        return static_cast<void*>(&value);
-    }
-};
-class JsonObjectString: public DefaultJsonObject{
-
-    std::string value = "";
-    public:
-    JsonObjectString(std::string value){
-        this->value = value;
-    }
-    void* getData() override{
-        return static_cast<void*>(&value);
-    }
-};
-class JsonObjectArray: public DefaultJsonObject{
-
-    DefaultJsonObject *value;
-    public:
-    JsonObjectArray(DefaultJsonObject *value){
-        this->value = value;
-    }
-    void* getData() override{
-        return static_cast<void*>(&value);
-    }
-};
-
-
-
+#include "JsonObjects.h"
 
 //https://stackoverflow.com/questions/4053837/colorizing-text-in-the-console-with-c
-class Messanger{
+class Messenger{
     public:
     static void LogError(std::string data){
 
@@ -96,11 +41,11 @@ class JsonParser{ //privessly called datasave
     std::string data;
     std::string fileName;
 
-    DefaultJsonObject *mainNode;
-    DefaultJsonObject **currentNode;
+    // *mainNode;
+    // **currentNode;
 
     int LoadFile(){
-        currentNode = &mainNode;
+        // currentNode = &mainNode;
         std::stringstream buf;
         buf << src.rdbuf();
         data = buf.str();
@@ -123,21 +68,70 @@ class JsonParser{ //privessly called datasave
     //string
     //number
     //whitespace
-    bool ValidateJson(){
-        bool inObject;
-        bool inArray;
+    bool ValidateJson(Objects *_rooter = nullptr, Objects *_currentObj = nullptr , int _line = 1){
+        //object current
+        
+        Objects *root = _rooter;
+        Objects *currentOBJ = _currentObj;
         bool inValue;
         bool inKey;
         std::string key;
         std::string value;
-        int line = 1;
-        for(int i =0;i<data.size();i ++){
+        std::string currentLine;
+        int line = _line;
+        switch(data[0]){
+            case '{':
+            root = new jsonObject();
+            break;
+            case '[':
+            root = new jsonArray();
+            break;
+            default:
+            inValue=true;
+            break;
+        }
+        if(inValue && line == 1){
+            for(int i =0 ;i<data.size();i++){
+                currentLine+=data[i];
+                switch(data[i]){
+                    case '\n':
+                    currentLine ="";
+                    break;
+                    case ':':
+                    Messenger::LogError("Trying to use value as key");
+                    Messenger::LogWarning(currentLine);
+                    return false;
+                    break;
+                    default:
+                    value+= data[i];
+                    break;
+                }
+            }
+            int numofquotes =0;
+            for(int i =0;i<value.size();i++){
+                if(value[i] == '\"' )
+                {
+                    if(i != 0 && value[i-1] !='\''){
+                        numofquotes++;
+
+                    }
+                }
+            }
+            if(numofquotes != 2)
+            {    Messenger::LogError("Trying to read to many strings");
+                return false;
+            }
+            std::cout << value;
+            return true;
+        }
+        inValue = false;
+        for(int i =1;i<data.size();i ++){
             switch(data[i]){
                 case '\n':
                     line++;
                 break;
                 case '{':
-                    
+                    if(TypeOfObject(currentOBJ))
                     //new object
                 break;
                 case '}':
@@ -145,17 +139,21 @@ class JsonParser{ //privessly called datasave
                 break;
                 case '"':
                     //entering string
+                    //if in key start key
                 break;
                 case ':':
                     //entering value;
+                    //if in value start value
                 break;
                 case ',':
+                    //new element in current
                     //new key if in object
                     //new value if in array
                 break;
 
                 case '[':
                     //enetring array
+                    //create obj array
                 break;
                 case ']':
                     //leaving array;
@@ -272,15 +270,15 @@ class JsonParser{ //privessly called datasave
     }
     int openFile(std::string file){  
         if(src.is_open()){
-            Messanger::LogWarning("You need to close the file, before opening new one");
+            Messenger::LogWarning("You need to close the file, before opening new one");
             return 2;
         } 
         src.open(file, std::ios::in | std::ios::out);
         if(src.fail()){
-            Messanger::LogError("File failed to open");
+            Messenger::LogError("File failed to open");
             return 1;
         }
-        Messanger::LogInfo("Opened:", file);
+        Messenger::LogInfo("Opened:", file);
         fileName = file;
         LoadFile();
         return 0;
@@ -289,42 +287,41 @@ class JsonParser{ //privessly called datasave
         // std::cout << data <<std::endl;
         //GenerateDataTree();
        // validateJson();
-        ValidateJson();
-        return 0;
+        return ValidateJson();
     }
 
     //https://stackoverflow.com/questions/53359727/how-to-save-and-also-read-c-fstream-file-without-closing-it  
     int saveFile(){  
         if(!src.is_open()){
-            Messanger::LogError("No file currently opened");
+            Messenger::LogError("No file currently opened");
             return -1;
 
         } 
         src.flush();
-        Messanger::LogInfo("Successful saved.");
+        Messenger::LogInfo("Successful saved.");
         return 0;
     }
     int saveAsFile(std::string file){  
         std::ofstream output;
-        Messanger::LogInfo("Saving data to:", file);
+        Messenger::LogInfo("Saving data to:", file);
         output.open(file, std::ios::out);
         if(output.fail()){
-            Messanger::LogError("File failed to open");
+            Messenger::LogError("File failed to open");
             return 1;
         }
         output << src.rdbuf();
         output.close();
-        Messanger::LogInfo("Successful saved.");
+        Messenger::LogInfo("Successful saved.");
         return 0;
     }
     int closeFile(bool displayError = true){   
         if(!src.is_open() && displayError){
-            Messanger::LogError("No file currently opened");
+            Messenger::LogError("No file currently opened");
             return -1;
         } 
         if(src.is_open()){
             src.close();
-            Messanger::LogInfo("Closed file", fileName);
+            Messenger::LogInfo("Closed file", fileName);
             fileName = "";
         }
         return 0;
