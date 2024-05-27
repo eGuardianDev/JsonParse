@@ -94,23 +94,23 @@ class JsonParser{ //privessly called datasave
         int ignoreIncoming = 0;
         
         for(int i =_index;i<data.size();i++){
-        
+
             switch(data[i]){
                 case '\n':
                     line++;
                 break;
 
                 case '{':
-                    if(ignore == true){
-                        ignoreIncoming++;
-                        break;
-                    }
+                    if(ignore){
+                        // std::cout << "found one more";
+                        ignoreIncoming++; break;
+                    } 
                     if(inValue){
                         ignore = true;
                         inValue = false;
-                        ignoreIncoming = 2;
+                        ignoreIncoming++;
                         std::cout <<std::string(pass,'\t');
-                        std::cout << pass<<" "<<key << ":\n";
+                        std::cout << key << ":\n";
                         key = ""; value = "";
                         bool temp = ValidateJson(currentOBJ,line, i,true,pass+1);
                         if(!temp) return temp;
@@ -121,26 +121,24 @@ class JsonParser{ //privessly called datasave
                     }
                     std::cout <<std::string(pass,'\t');
 
-                    std::cout << pass<<"{\n";
+                    std::cout << "{\n";
                     
                    
                 
                 break;
                 case '}':
-                    ignoreIncoming--;
-                    if(ignoreIncoming == 1) {
-                        ignore = false;   
-                    }
+                    if(ignore) {ignoreIncoming--; }
+                    if(ignoreIncoming == 0) { ignore = false;}
                     if(ignore) break;
-                     
+
                     if(key.size()>0){
                         std::cout <<std::string(pass,'\t');
-                        std::cout <<pass << " "<< key << ":" << value << std::endl;
+                        std::cout << key << ":" << value << std::endl;
                         key = ""; value = "";
                     }
                     
                     std::cout <<std::string(pass,'\t');
-                    std::cout <<pass<<"}\n";
+                    std::cout <<"}\n";
                     if(_toReturn) return true;
 
 
@@ -161,10 +159,10 @@ class JsonParser{ //privessly called datasave
                     if(ignore) break;
                     if(inValue){
                         std::cout <<std::string(pass,'\t');
-                        std::cout <<pass << " "<< key << ":" << value << "";
+                        std::cout << key << ":" << value << "";
                         key = ""; value = "";
                     }
-                    std::cout << pass<<",\n";
+                    std::cout << ",\n";
                     inKey = true;
                     inValue = false;
                   
