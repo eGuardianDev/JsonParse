@@ -1,0 +1,9 @@
+{
+	"doge":1,
+	"cat":"2",
+	"water":{
+		"data": 3,
+		"dater":"rep"
+	},
+	"dog":7
+}

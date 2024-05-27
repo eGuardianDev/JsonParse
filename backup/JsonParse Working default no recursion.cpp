@@ -86,73 +86,61 @@ class JsonParser{ //privessly called datasave
 
         bool inObject = false;
         bool inArray = false;
-
-        bool expectKey =false;
-        bool expectVal =false;
-        bool ignore = false;
-
-        int ignoreIncoming = 0;
-        
+        int ignoreIncoming = -1;
         for(int i =_index;i<data.size();i++){
 
             switch(data[i]){
                 case '\n':
                     line++;
                 break;
-
                 case '{':
-                    if(inValue){
-                        ignore = true;
-                        inValue = false;
-                        ignoreIncoming++;
-                        std::cout <<'{';
-                        break;
-                    }else{
+
+                    ignoreIncoming++;
+                    if(!inValue){
                         inKey = true;
                         inValue = false;
+                        inKey = "";
+                        inValue = "";
+                        std::cout << "{\n";
+                    }else{
+                        //call shit
                     }
-                    if(ignore){
-                        ignoreIncoming++; break;
-                    } 
-                    std::cout << "{\n";
-                    
-                   
-                
+
+
                 break;
                 case '}':
-                    if(ignore) {ignoreIncoming--; }
-                    if(ignoreIncoming == 0) { ignore = false;}
-                    if(ignore) break;
-
-                    if(key.size()>0){
-                        std::cout << key << ":" << value;
-                        key = ""; value = "";
+                    ignoreIncoming--;
+                    if(inValue){
+                        value ="";
+                        key= "";
+                        inKey = false;
+                        inValue = false;
+                        break;
                     }
-                    
-                    std::cout << "}\n";
+                    if(value.size()>0){
+                        if(ignoreIncoming >0) break;
+                        std::cout << key << ":" <<value <<"\n}\n";
+                        key="";value ="";
+                    }else{
+                        std::cout << "}\n";
+                    }
                     inKey = false;
                     inValue = false;
 
-
                 break;
-
-
                 case ':':
-                    if(ignore) break;
+                    if(ignoreIncoming >0) break;
                     inKey = false;
                     inValue = true;
-                    
+
                 break;
                 case ',':
-                    if(ignore) break;
-                    if(inValue){
-                        std::cout << key << ":" << value << "";
-                        key = ""; value = "";
-                    }
-                    std::cout << ",\n";
-                    inKey = true;
-                    inValue = false;
-                  
+                    if(ignoreIncoming >0) break;
+
+                    std::cout << key << ":" <<value <<",\n";
+                    key="";value="";
+                    inKey = true; inValue = false;
+
                 break;
                 case '[':
                     
@@ -187,7 +175,7 @@ class JsonParser{ //privessly called datasave
     //         if(place>=0) std::cout <<place << " ";
     //         std::cout << k<< ":" << v << std::endl;
     //         k = "";
-    //         v = "";//
+    //         v = "";
     //     };
     //     int line = 1;
     //     for(int i =0;i<data.size();i++){
