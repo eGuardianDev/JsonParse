@@ -2,21 +2,6 @@
 
 
 
-ValueType TypeOfValue(Values* val){
-    if(dynamic_cast<vString*>(val) != nullptr) return eString;
-    if(dynamic_cast<vNumber*>(val) != nullptr) return eNumber;
-    if(dynamic_cast<vObject*>(val) != nullptr) return eObject;
-    if(dynamic_cast<vArray*>(val) != nullptr) return eArray;
-    if(dynamic_cast<vBoolean*>(val) != nullptr) return eBoolean;
-    return notFound;
-}
-
-ValueType TypeOfObject(Objects* obj){
-    if(dynamic_cast<jsonObject*>(obj) != nullptr) return eObject;
-    if(dynamic_cast<jsonArray*>(obj) != nullptr) return eArray;
-    return notFound;
-}
-
     // virtual int setData(void*) =0 ;
     // virtual int removeData(unsigned int);
     // virtual void* getData(unsigned int);
@@ -210,6 +195,7 @@ size_t Objects::Size(){
 
 // =========== JSON OBJECT
 jsonObject::jsonObject(){
+    this->size = 0;
 }
 jsonObject::jsonObject(jsonObject& obj){
     this->pairs = new Pair*[obj.Size()];
@@ -345,10 +331,11 @@ Objects* jsonArray::Clone(){
 }
 int jsonArray::AddValue(Values* value){
     this->expand();
-   this->values[this->Size()-1] = value;
+    this->values[this->Size()-1] = value;
     return 0;
 }
 Values* jsonArray::ReturnValue(unsigned int index){
+    // if(index >= Size()) return nullptr;
     return values[index];
 }
 int jsonArray::RemoveValue(unsigned int index){

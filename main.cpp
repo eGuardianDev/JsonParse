@@ -15,7 +15,8 @@ int conversionCmd(std::string str){
     if(str == "saveas") return esaveas;
     if(str == "close") return eclose;
     if(str == "exit") return eexit;
-    if(str == "data") return edata;
+    if(str == "print") return eprint;
+    if(str == "validate") return evalidate;
     return -1;
 }
 // implementation https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
@@ -53,12 +54,15 @@ int main(){
             case ehelp:
                 help(); 
                 break;
-            case edata:
+            case evalidate:
                 if(_displayData()== true){
                     Messenger::LogInfo("Current data is", "\033[1;32mvalid\033[m");
                 }else{
                     Messenger::LogInfo("Current data is", "\033[1;31minvalid\033[m");
                 }
+            break;
+            case eprint:
+                print();
             break;
             case eopen:
                 if(cmdSplit.size() != 2 ){

@@ -103,8 +103,9 @@ enum ValueType{
     notFound = -1
 };
 
-ValueType TypeOfValue(Values* val);
-ValueType TypeOfObject(Objects* obj);
+// ValueType TypeOfValue(Values* val);
+// ValueType TypeOfObject(Objects* obj);
+
 class vObject : public Values{
     protected:
     jsonObject *value;

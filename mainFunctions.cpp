@@ -1,4 +1,4 @@
-#pragma one
+
 #include <iostream>
 #include "JsonParse.cpp"
 enum cmdData{
@@ -8,7 +8,8 @@ enum cmdData{
     esaveas = 3,
     eclose = 4,
     eexit = 5,
-    edata = 6
+    eprint = 6,
+    evalidate= 7
 };
 
 JsonParser ds;
@@ -42,6 +43,9 @@ int close(){
 }
 int _displayData(){
     return ds.displayData();
+}
+int print(){
+    return ds.DisplayTree();
 }
 
 
