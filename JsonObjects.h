@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <cstddef>
+#include <ostream>
 #include <vector>
 
 
@@ -12,6 +13,8 @@
 class Values : public Rooter{
     public:
     Values() {};
+    virtual void print(std::ostream&) = 0;
+
     virtual Values* Clone() = 0;
     virtual int setData(void*) =0 ;
     virtual int removeData(unsigned int) = 0;
@@ -48,6 +51,7 @@ class Objects : public Rooter{
     virtual void shrink() = 0;
     public:
     size_t Size();
+    virtual void print(std::ostream&) = 0;
     virtual Objects* Clone() = 0;
     virtual ~Objects() {}
 };
@@ -63,7 +67,9 @@ class jsonObject : public Objects{
     jsonObject();
     jsonObject(jsonObject&);
     Objects* Clone() override ;
- 
+    void print(std::ostream&) override;
+
+
     void AddPair(Pair * pair);
     void AddPair(std::string key, Values* value);
     
@@ -85,6 +91,7 @@ class jsonArray : public Objects{
     jsonArray();
     jsonArray(jsonArray&);
     Objects* Clone() override;
+    void print(std::ostream&) override;
 
     int AddValue(Values* value);
     Values* ReturnValue(unsigned int index);
@@ -115,6 +122,7 @@ class vObject : public Values{
     int setData(void*) override ;
     int removeData(unsigned int) override;
     void* getData(unsigned int) override;
+    void print(std::ostream&) override;
 
     vObject();
     vObject(jsonObject);
@@ -133,6 +141,7 @@ class vArray : public Values{
     int setData(void*) override ;
     int removeData(unsigned int) override;
     void* getData(unsigned int) override;
+    void print(std::ostream&) override;
 
     vArray();
     vArray(vArray&);
@@ -150,6 +159,7 @@ class vString : public Values{
     int setData(void*) override ;
     int removeData(unsigned int) override;
     void* getData(unsigned int) override;
+    void print(std::ostream&) override;
 
     vString();
     vString(vString&);
@@ -167,6 +177,7 @@ class vNumber : public Values{
     int setData(void*) override ;
     int removeData(unsigned int) override;
     void* getData(unsigned int) override;
+    void print(std::ostream&) override;
 
     vNumber();
     vNumber(vNumber&);
@@ -184,6 +195,7 @@ class vBoolean : public Values{
     int setData(void*) override ;
     int removeData(unsigned int) override;
     void* getData(unsigned int) override;
+    void print(std::ostream&) override;
 
   
     vBoolean();

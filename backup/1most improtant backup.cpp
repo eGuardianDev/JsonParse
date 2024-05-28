@@ -118,10 +118,6 @@ class JsonParser{ //privessly called datasave
         return notFound;
     }
 
-    bool generateTree(Objects* _currentObj, std::string key, std::string value ){
-        return true;
-    }
-
     bool ValidateJson(Objects *_currentObj = nullptr , int _line = 1, int _index = 0, bool _toReturn = false,int pass = 0,bool expectedObject = false){
         //object current
         
@@ -175,7 +171,6 @@ class JsonParser{ //privessly called datasave
                         return false;
                     }
                     if(inValue){
-                        bool temp;
                         if(value.size() >0){
                              Messenger::LogError("Cannot create object after alreading assigning values");
                             Messenger::LogInfo("line" , std::to_string(line));
@@ -191,26 +186,11 @@ class JsonParser{ //privessly called datasave
                                 Messenger::LogInfo("line", std::to_string(line));
                                 return false;
                             } 
-                            // std::cout <<std::string(pass,'\t');
-                            ValueType vt = typeOfObject(currentOBJ);
-                            switch(vt){
-                                case eObject:
-                                    if(true){
-                                        jsonObject *toPass = new jsonObject(); 
-                                        ((jsonObject*)currentOBJ)->AddPair(key,new vObject(toPass));
-                                        bool temp = ValidateJson(toPass,line, i,true,pass+1);
-                                    }
-                                break;
-                                case eArray:
-                                break;
-                                default:
-                                Messenger::LogError("Something is wrong with checking type");
-                                return false;
-                                break;
-                            }
-                            // std::cout << pass<<" "<<key << ":\n";
+                            std::cout <<std::string(pass,'\t');
+                            std::cout << pass<<" "<<key << ":\n";
                         }
                         key = ""; value = "";
+                        bool temp = ValidateJson(currentOBJ,line, i,true,pass+1);
                         if(!temp) return temp;
                         justReturned = true;
                         break;
@@ -218,9 +198,9 @@ class JsonParser{ //privessly called datasave
                         inKey = true;
                         inValue = false;
                     }
-                    // std::cout <<std::string(pass,'\t');
+                    std::cout <<std::string(pass,'\t');
 
-                    // std::cout << pass<<"{\n";
+                    std::cout << pass<<"{\n";
                     
                    
                 
@@ -239,42 +219,15 @@ class JsonParser{ //privessly called datasave
                                 Messenger::LogInfo("line", std::to_string(line));
                                 return false;
                             } 
-                             ValueType vt = typeOfObject(currentOBJ);
-                            switch(vt){
-                                case eObject:
-                                    if(true){
-                                        Values *v;
-                                        switch(defineValueString(value,line)){
-                                            case eString:
-                                            v= new vString(value);
-                                            break;
-                                            case eNumber:
-                                            v = new vNumber(std::stod(value));
-                                            break;
-                                            case eBoolean:
-                                            if(value == "false") v = new vBoolean(false);
-                                            else v = new vBoolean(true);
-                                            break;
-                                            default:
-                                            Messenger::LogError("Passing data cannot be defined");
-                                            return false;
-                                            break;
-                                        }
-                                        ((jsonObject*)currentOBJ)->AddPair(key,v);
-                                    }
-                                break;
-                                case eArray:
-                                break;
-                                default:
-                                Messenger::LogError("Something is wrong with checking type");
-                                return false;
-                                break;
-                            }
+
+                        std::cout <<std::string(pass,'\t');
+                        std::cout <<pass << " "<< key << ":" << value << std::endl;
+                        // std::cout << "defined:"<< defineValueString(value, line);
                         key = ""; value = "";
                     }  
                     if(justReturned == false){
-                        // std::cout <<std::string(pass,'\t');
-                        // std::cout <<pass<<"}\n";
+                        std::cout <<std::string(pass,'\t');
+                        std::cout <<pass<<"}\n";
                     }
                     justReturned = false;
                     if(_toReturn) return true;
@@ -323,8 +276,7 @@ class JsonParser{ //privessly called datasave
                                 Messenger::LogInfo("line", std::to_string(line));
                                 return false;
                             } 
-                        
-                        
+
                         std::cout <<std::string(pass,'\t');
                         std::cout <<pass << " "<< key << ":" << value << "";
                         key = ""; value = "";
@@ -396,16 +348,11 @@ class JsonParser{ //privessly called datasave
     }
     bool _displayTree(){
         std::cout << "displaying tree" << std::endl;
-        root->print(std::cout);
-        // root = new jsonObject();
-        // jsonObject *jo = new jsonObject();
-        // jo->AddPair("nutss",new vString("lol"));
-        // ((jsonObject*)root)->AddPair(new Pair("cat",new vObject(jo)));
-        // ((jsonObject*)root)->AddPair(new Pair("val",new vString("nut")));
+        root = new jsonArray();
+        if(typeOfObject(root) == eObject) std::cout << "obj";
+        if(typeOfObject(root) == eArray) std::cout << "nuts";
         // ((jsonObject*)root)->AddPair(new Pair("key",new vNumber(12)));
-        // // std::cout << *(double*)((jsonObject*)root)->ReturnPair("key")->value->getData();
-        // root->print(std::cout);
-        // jo->print(std::cout);
+        // std::cout << *(double*)((jsonObject*)root)->ReturnPair("key")->value->getData();
         return 0;
     }
 

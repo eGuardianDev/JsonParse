@@ -1,4 +1,5 @@
 #include "JsonObjects.h"
+#include <ostream>
 
 
 
@@ -12,6 +13,9 @@
 //================ Number Values
 Values* vNumber::Clone(){
     return new vNumber(this->value);
+}
+void vNumber::print(std::ostream& os){
+    os << *(this->value);
 }
 vNumber::vNumber(){
     this->value = new double(0);
@@ -49,6 +53,9 @@ vNumber::~vNumber(){
 Values* vString::Clone(){
     return new vString(this->value);
 }
+void vString::print(std::ostream& os){
+    os << *(this->value);
+}
 vString::vString(){
     this->value = new std::string("");
 }
@@ -85,6 +92,9 @@ vString::~vString(){
 Values* vBoolean::Clone(){
     return new vBoolean(this->value);
 }
+void vBoolean::print(std::ostream& os){
+    os << *(this->value);
+}
 vBoolean::vBoolean(){
     this->value = new bool(false);
 }
@@ -118,14 +128,17 @@ vBoolean::~vBoolean(){
 Values* vObject::Clone(){
     return new vObject(this->value);
 }
+void vObject::print(std::ostream& os){
+    this->value->print(os);
+}
 vObject::vObject(){
     this->value = new jsonObject();
 }
 vObject::vObject(jsonObject * data){
-    this->setData(data);
+    this->value = data;
 }
 vObject::vObject(jsonObject data){
-    this->setData(new jsonObject(data));
+    this->value = (jsonObject*)data.Clone();
 }
 int vObject::setData(void* data){
     if(this->value != nullptr){
@@ -154,6 +167,9 @@ Values* vArray::Clone(){
     vArray *varr = new vArray();
     varr->setData(this->value->Clone());
     return varr;
+}
+void vArray::print(std::ostream& os){
+    this->value->print(os);
 }
 int vArray::setData(void* data) {
     this->value = (jsonArray*)data;
@@ -196,6 +212,16 @@ size_t Objects::Size(){
 // =========== JSON OBJECT
 jsonObject::jsonObject(){
     this->size = 0;
+}
+void jsonObject::print(std::ostream& os){
+    os << "{";
+    std::cout <<Size();
+    for(int i = 0;i< this->Size();i++){
+        os << pairs[i]->key << ":";
+        pairs[i]->value->print(os);
+        if(i != this->Size()-1) os << ",";
+    }
+    os << "}";
 }
 jsonObject::jsonObject(jsonObject& obj){
     this->pairs = new Pair*[obj.Size()];
@@ -301,6 +327,14 @@ void jsonArray::expand(){
     delete [] this->values;
     this->values = temp;
     
+}
+void jsonArray::print(std::ostream& os){
+    os << "[";
+    for(int i =0 ;i<Size();i++){
+        values[i]->print(os);
+        if(i != this->Size()-1) os << ",";
+    }
+    os << "]";
 }
 void jsonArray::shrink(){
     Values** temp = new Values*[this->size-1];
