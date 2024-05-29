@@ -1,5 +1,6 @@
 
 #include "JsonObjects.h"
+#include "Rooter.h"
 #include <cerrno>
 #include <ostream>
 #include <sstream>
@@ -75,6 +76,8 @@ class JsonParser{ //privessly called datasave
     //validates if string is capable of being key or value
     bool validateString(std::string str){
         int quotesNumber = 0;
+        // std::cout << "current check:"<<str << " with l: " <<str.length() <<'\n';
+        if(str.length() == 0 ) return true;
         for(int i = 0;i<str.length();i++){
             if(str[i] == '\"'){
                 quotesNumber++;
@@ -109,11 +112,12 @@ class JsonParser{ //privessly called datasave
         }
         if(isItString(val)){
             return eString;
-        }else{
-            if(val == "false" || val == "true") return eBoolean;
-           bool isNumber = std::find_if(val.begin(), val.end(), ::isdigit) != val.end();
-            if(isNumber) return eNumber;
         }
+    
+        if(val == "false" || val == "true") return eBoolean;
+        bool isNumber = std::find_if(val.begin(), val.end(), ::isdigit) != val.end();
+        if(isNumber) return eNumber;
+
 
         return notFound;
     }
@@ -121,11 +125,14 @@ class JsonParser{ //privessly called datasave
     bool generateTree(Objects* _currentObj, std::string key, std::string value ){
         return true;
     }
-
+    bool soloData = false;
+    Values *globalTemp;
     bool ValidateJson(Objects *_currentObj = nullptr , int _line = 1, int _index = 0, bool _toReturn = false,int pass = 0,bool expectedObject = false){
+        // std::cout << "trie";
         //object current
         
-        Objects *currentOBJ = _currentObj;
+        Objects *currentOBJ;
+        currentOBJ = _currentObj;
         bool inValue;
         bool inKey;
         std::string key;
@@ -139,7 +146,7 @@ class JsonParser{ //privessly called datasave
         bool expectKey =false;
         bool expectVal =false;
         bool ignore = false;
-        bool soloData = false;
+        soloData = false;
 
         int ignoreIncoming = 0;
         bool ignoreCommingArray = false;
@@ -149,12 +156,26 @@ class JsonParser{ //privessly called datasave
         bool expectingNewValue = false;
         bool expectingNewKey = false;
         bool justReturned = false;
+        if(line >1){
 
-        if(data[0] != '{' && data[0] !='['){
-            inValue= true;
-            _index++;
-            value+=data[0];
-            soloData = true;
+        }else {
+            
+            delete root;
+            root = new jsonObject();
+            if(data[0] != '{' && data[0] !='['){
+                inValue= true;
+                _index++;
+                value+=data[0];
+                soloData = true;
+                
+            }else{
+                if(data[0] == '{'){
+                    root = new jsonObject();
+                }else{
+                    root = new jsonArray();
+                }
+            }
+            currentOBJ = root;
         }
      
         for(int i =_index;i<data.size();i++){
@@ -165,6 +186,7 @@ class JsonParser{ //privessly called datasave
                 break;
 
                 case '{':
+                    
                     if(ignore == true){
                         ignoreIncoming++;
                         break;
@@ -185,20 +207,26 @@ class JsonParser{ //privessly called datasave
                         inValue = false;
                         ignoreIncoming = 2;
                         if(key.size()>0){
+                            std::cout << "this thing" << key;   
+                            // std::cout << pass<<" "<<key << ":\n";
                              if(!validateString(key) || !validateString(value))
+
                             {
                                 Messenger::LogError("Parsing multiple strings as key or value");
                                 Messenger::LogInfo("line", std::to_string(line));
                                 return false;
                             } 
-                            // std::cout <<std::string(pass,'\t');
+                            std::cout <<std::string(pass,'\t');
                             ValueType vt = typeOfObject(currentOBJ);
                             switch(vt){
                                 case eObject:
                                     if(true){
+                                        // std::cout << "creating object";
                                         jsonObject *toPass = new jsonObject(); 
                                         ((jsonObject*)currentOBJ)->AddPair(key,new vObject(toPass));
                                         bool temp = ValidateJson(toPass,line, i,true,pass+1);
+                                        if(!temp) return temp;
+
                                     }
                                 break;
                                 case eArray:
@@ -208,19 +236,18 @@ class JsonParser{ //privessly called datasave
                                 return false;
                                 break;
                             }
-                            // std::cout << pass<<" "<<key << ":\n";
                         }
                         key = ""; value = "";
-                        if(!temp) return temp;
                         justReturned = true;
                         break;
                     }else{
                         inKey = true;
+                        expectKey = true;   
                         inValue = false;
                     }
-                    // std::cout <<std::string(pass,'\t');
+                    std::cout <<std::string(pass,'\t');
 
-                    // std::cout << pass<<"{\n";
+                    std::cout << pass<<"{\n";
                     
                    
                 
@@ -233,13 +260,15 @@ class JsonParser{ //privessly called datasave
                     if(ignore) break;
                      
                     if(key.size()>0){
+                        std::cout << "this things:: " <<key;
                             if(!validateString(key) || !validateString(value))
                             {
                                 Messenger::LogError("Parsing multiple strings as key or value");
                                 Messenger::LogInfo("line", std::to_string(line));
                                 return false;
                             } 
-                             ValueType vt = typeOfObject(currentOBJ);
+                            ValueType vt = typeOfObject(currentOBJ);
+
                             switch(vt){
                                 case eObject:
                                     if(true){
@@ -273,8 +302,8 @@ class JsonParser{ //privessly called datasave
                         key = ""; value = "";
                     }  
                     if(justReturned == false){
-                        // std::cout <<std::string(pass,'\t');
-                        // std::cout <<pass<<"}\n";
+                        std::cout <<std::string(pass,'\t');
+                        std::cout <<pass<<"}\n";
                     }
                     justReturned = false;
                     if(_toReturn) return true;
@@ -303,6 +332,7 @@ class JsonParser{ //privessly called datasave
                     
                 break;
                 case ',':
+                    std::cout << "founded this";
                     if(ignoreCommingArray) break;
                     if(ignore) break;
                     if(inKey){
@@ -326,6 +356,34 @@ class JsonParser{ //privessly called datasave
                         
                         
                         std::cout <<std::string(pass,'\t');
+                        switch(typeOfObject(currentOBJ)){
+                            case eObject:
+                            if(true){
+                                Values *v;
+                                 switch(defineValueString(value,line)){
+                                            case eString:
+                                            v= new vString(value);
+                                            std::cout << *(std::string*)v->getData();
+                                            break;
+                                            case eNumber:
+                                            v = new vNumber(std::stod(value));
+                                            break;
+                                            case eBoolean:
+                                            if(value == "false") v = new vBoolean(false);
+                                            else v = new vBoolean(true);
+                                            break;
+                                            default:
+                                            Messenger::LogError("Passing data cannot be defined");
+                                            return false;
+                                            break;
+                                    }
+                                ((jsonObject*)currentOBJ)->AddPair(key,v);
+                                 std::cout << key <<" : " << value;
+                            }
+                            break;
+                            case eArray:
+                            break;
+                        }
                         std::cout <<pass << " "<< key << ":" << value << "";
                         key = ""; value = "";
                     }
@@ -373,7 +431,23 @@ class JsonParser{ //privessly called datasave
             
         }
         if(soloData){
-            std::cout << value;
+            switch(defineValueString(value,line)){
+                case eString:
+                globalTemp= new vString(value);
+                break;
+                case eNumber:
+                globalTemp= new vNumber(std::stod(value));
+                break;
+                case eBoolean:
+                if(value == "false") globalTemp = new vBoolean(false);
+                else globalTemp = new vBoolean(true);
+                break;
+                default:
+                Messenger::LogError("Passing data cannot be defined");
+                return false;
+                break;
+            }
+            // std::cout << value;
         }
 
         return true;
@@ -396,7 +470,15 @@ class JsonParser{ //privessly called datasave
     }
     bool _displayTree(){
         std::cout << "displaying tree" << std::endl;
-        root->print(std::cout);
+        ((jsonObject*)root)->print(std::cout, 0);
+        // jsonObject *jo = new jsonObject();
+        // jo->AddPair("asd", new vNumber(12));
+        // jo->AddPair("asd", new vNumber(12));
+        // jo->print(std::cout);
+        // root = new jsonObject();
+        // ((jsonObject*)root)->AddPair("key", new vString("\"cat\""));
+        // root->print(std::cout);
+        // std::cout << typeOfObject(root);
         // root = new jsonObject();
         // jsonObject *jo = new jsonObject();
         // jo->AddPair("nutss",new vString("lol"));
@@ -413,6 +495,7 @@ class JsonParser{ //privessly called datasave
     std::string getFileName(){
         return fileName;
     }
+    int open = 0;
     int openFile(std::string file){  
         if(src.is_open()){
             Messenger::LogWarning("You need to close the file, before opening new one");
@@ -423,12 +506,18 @@ class JsonParser{ //privessly called datasave
             Messenger::LogError("File failed to open");
             return 1;
         }
+        open++;
         Messenger::LogInfo("Opened:", file);
         fileName = file;
         LoadFile();
+        std::cout << data;
         return 0;
     }
     int DisplayTree(){
+        if(soloData){
+            globalTemp->print(std::cout,0);    
+            return 0;
+        }
         return _displayTree();
         return 0;
     }
@@ -436,7 +525,18 @@ class JsonParser{ //privessly called datasave
         // std::cout << data <<std::endl;
         //GenerateDataTree();
        // validateJson();
-        return ValidateJson(root);
+        if(root !=nullptr){
+            // delete root;
+            root = nullptr;
+        }
+      
+        // if(root == nullptr && open >1){
+            // std::cout << "null";
+            // return 0;
+        // }else{
+            return ValidateJson(root);
+        // }
+        
     }
 
     //https://stackoverflow.com/questions/53359727/how-to-save-and-also-read-c-fstream-file-without-closing-it  
@@ -463,12 +563,15 @@ class JsonParser{ //privessly called datasave
         Messenger::LogInfo("Successful saved.");
         return 0;
     }
+    
     int closeFile(bool displayError = true){   
         if(!src.is_open() && displayError){
             Messenger::LogError("No file currently opened");
             return -1;
         } 
         if(src.is_open()){
+            
+            // delete root;
             src.close();
             Messenger::LogInfo("Closed file", fileName);
             fileName = "";

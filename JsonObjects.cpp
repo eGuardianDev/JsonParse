@@ -14,7 +14,7 @@
 Values* vNumber::Clone(){
     return new vNumber(this->value);
 }
-void vNumber::print(std::ostream& os){
+void vNumber::print(std::ostream& os,int pass =0){
     os << *(this->value);
 }
 vNumber::vNumber(){
@@ -45,7 +45,8 @@ void* vNumber::getData(unsigned int index =0 ){
 }
 vNumber::~vNumber(){
     // if(this->value != nullptr){
-        delete this->value;
+        // delete this->value;
+        // std::cout << "deleted";
     // }
 }
 //=========== String Value
@@ -53,7 +54,7 @@ vNumber::~vNumber(){
 Values* vString::Clone(){
     return new vString(this->value);
 }
-void vString::print(std::ostream& os){
+void vString::print(std::ostream& os,int pass){
     os << *(this->value);
 }
 vString::vString(){
@@ -92,7 +93,7 @@ vString::~vString(){
 Values* vBoolean::Clone(){
     return new vBoolean(this->value);
 }
-void vBoolean::print(std::ostream& os){
+void vBoolean::print(std::ostream& os,int pass = 0){
     os << *(this->value);
 }
 vBoolean::vBoolean(){
@@ -128,8 +129,8 @@ vBoolean::~vBoolean(){
 Values* vObject::Clone(){
     return new vObject(this->value);
 }
-void vObject::print(std::ostream& os){
-    this->value->print(os);
+void vObject::print(std::ostream& os,int pass = 0){
+    this->value->print(os,pass);
 }
 vObject::vObject(){
     this->value = new jsonObject();
@@ -168,8 +169,8 @@ Values* vArray::Clone(){
     varr->setData(this->value->Clone());
     return varr;
 }
-void vArray::print(std::ostream& os){
-    this->value->print(os);
+void vArray::print(std::ostream& os,int pass){
+    this->value->print(os, pass+1);
 }
 int vArray::setData(void* data) {
     this->value = (jsonArray*)data;
@@ -213,12 +214,49 @@ size_t Objects::Size(){
 jsonObject::jsonObject(){
     this->size = 0;
 }
-void jsonObject::print(std::ostream& os){
+ValueType typeOfValue(Values* val){
+    if(dynamic_cast<vString*>(val) != nullptr) return eString;
+    if(dynamic_cast<vNumber*>(val) != nullptr) return eNumber;
+    if(dynamic_cast<vObject*>(val) != nullptr) return eObject;
+    if(dynamic_cast<vArray*>(val) != nullptr) return eArray;
+    if(dynamic_cast<vBoolean*>(val) != nullptr) return eBoolean;
+    return notFound;
+}   
+
+ValueType typeOfObject(Objects* obj){
+    if(dynamic_cast<jsonObject*>(obj) != nullptr) return eObject;
+    if(dynamic_cast<jsonArray*>(obj) != nullptr) return eArray;
+    return notFound;
+}
+void jsonObject::print(std::ostream& os,int pass =0){
     os << "{";
     std::cout <<Size();
     for(int i = 0;i< this->Size();i++){
         os << pairs[i]->key << ":";
-        pairs[i]->value->print(os);
+        // os << typeOfValue(pairs[i]->value);
+        pairs[i]->value->print(os,pass+1);
+        // switch(typeOfValue(pairs[i]->value)){
+        //     case eString:
+        //     // ((vString*)pairs[i]->value)->print(os);
+        //     break;
+        //     // case eNumber:
+        //     // // ((vNumber*)pairs[i]->value)->print(os);
+        //     // break;
+        //     // case eObject:
+        //     // ((vObject*)pairs[i]->value)->print(os);
+        //     // break;   
+        //     // case eArray:
+        //     // ((vArray*)pairs[i]->value)->print(os);
+        //     // break;   
+        //     // case eBoolean:
+        //     // ((vBoolean*)pairs[i]->value)->print(os);
+        //     // break;
+        //     default:
+        //     std::cout << "cannot parse value!";
+        //     break;
+
+
+        // }
         if(i != this->Size()-1) os << ",";
     }
     os << "}";
@@ -234,8 +272,10 @@ void jsonObject::expand(){
     for(int i =0; i<Size();i++){
         temp[i] = this->pairs[i];
     }
+    for(int i = 0;i<Size();i++){
+        // delete this->pairs[i]->value;
+    }
     size++;
-    delete [] this->pairs;
     this->pairs = temp;
 }
 void jsonObject::shrink(){
@@ -328,10 +368,10 @@ void jsonArray::expand(){
     this->values = temp;
     
 }
-void jsonArray::print(std::ostream& os){
+void jsonArray::print(std::ostream& os, int pass = 0){
     os << "[";
     for(int i =0 ;i<Size();i++){
-        values[i]->print(os);
+        values[i]->print(os,pass+1);
         if(i != this->Size()-1) os << ",";
     }
     os << "]";

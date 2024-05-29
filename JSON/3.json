@@ -1,12 +1,9 @@
 {
 	"doge":1,
 	"cat":"2",
-	"water":{
-		"data": 3,
-		"dater":"rep",
-		"rip":{
-			"nuts":4
-		}
-	},
-	"dog":7
+	"lol":{ "asd":1,
+			"cast":{
+				"r":1
+			}},
+	"uwu":"cat"
 }
