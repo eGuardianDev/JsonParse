@@ -1,6 +1,7 @@
 #include "Objects.h"
 
 
+
 // =========== DEFUALT OBJECT
 size_t Objects::Size(){
     return this->size;

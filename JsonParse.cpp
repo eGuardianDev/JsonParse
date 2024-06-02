@@ -54,9 +54,7 @@ class JsonParser{ //privessly called datasave
 
         //https://stackoverflow.com/questions/556277/trim-remove-a-tab-t-from-a-string
         data.erase(std::remove(data.begin(), data.end(), '\t'), data.end());
-       // std::cout <<data;
-       // data.erase(std::remove(data.begin(), data.end(), '\n'), data.end());
-       // data = CleanSpaces(data);
+    
         return 0;
     }
 
@@ -186,12 +184,11 @@ class JsonParser{ //privessly called datasave
                     delete root;
                     root = new jsonArray();
                 }
-            }
             currentOBJ = root;
+            }
         }
         
         for(int i =_index;i<data.size();i++){
-        
             switch(data[i]){
                 case '\n':
                     line++;
@@ -340,7 +337,6 @@ class JsonParser{ //privessly called datasave
                     
                 break;
                 case ',':
-                    // std::cout << "founded `this";
                     if(ignoreCommingArray) break;
                     if(ignore) break;
                     if(inKey){
@@ -384,13 +380,11 @@ class JsonParser{ //privessly called datasave
                                             break;
                                     }
                                 ((jsonObject*)currentOBJ)->AddPair(key,v);
-                                //  std::cout << key <<" : " << value;
                             }
                             break;
                             case eArray:
                             break;
                         }
-                        // std::cout <<pass << " "<< key << ":" << value << "";
                         key = ""; value = "";
                     }
                     if(inArray){expectingNewElement = true;}
@@ -439,6 +433,7 @@ class JsonParser{ //privessly called datasave
             
         }
         if(soloData){
+            // value = data;
             switch(defineValueString(value,line)){
                 case eString:
                 globalTemp= new vString(value);
@@ -456,7 +451,6 @@ class JsonParser{ //privessly called datasave
                 break;
             }
         }
-        // std::cout << Foundkeys.size();
         for(int i =0 ;i <Foundkeys.size()-1;i++){
             for(int j=i+1; j<Foundkeys.size();j++){
                 if(Foundkeys[i] == Foundkeys[j]){
@@ -489,7 +483,7 @@ class JsonParser{ //privessly called datasave
         return notFound;
     }
     bool _displayTree(){
-        std::cout << "displaying tree" << std::endl;
+        std::cout << "Displaying data:" << std::endl;
         ((jsonObject*)root)->print(std::cout, 0);
 
         return 0;
@@ -741,7 +735,7 @@ class JsonParser{ //privessly called datasave
             src.close();
             Messenger::LogInfo("Closed file", fileName);
             fileName = "";
-            std::cout << (root==NULL);
+            // std::cout << (root==NULL);
         }
         return 0;
     }

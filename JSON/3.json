@@ -2,10 +2,9 @@
 	"doge":1,
 	"cat":"2",
 	"lol":{
-			"asd":1,
-"cast":{
-				"r":1
-			}
-		},
-	"uwu":"cat"
+		"cast":	{
+			"r":1
+		}
+	},
+	"omega":"cat"
 }

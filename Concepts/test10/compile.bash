@@ -1,4 +1,4 @@
 #!/bin/bash
 
-g++ test.cpp header/*.cpp -o test.o
+g++ test.cpp *.cpp  -o test.o
 ./test.o

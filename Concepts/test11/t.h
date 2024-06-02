@@ -5,16 +5,12 @@
 #include <iostream>
 
 #include <cstddef>
-#include <ostream>
 #include <vector>
 
 
 
 class Values : public Rooter{
     public:
-    Values() {};
-    virtual void print(std::ostream&,int pass) = 0;
-
     virtual Values* Clone() = 0;
     virtual int setData(void*) =0 ;
     virtual int removeData(unsigned int) = 0;
@@ -22,12 +18,10 @@ class Values : public Rooter{
     virtual ~Values() {};
 };
 struct Pair{
+    public:
     std::string key;
     Values *value;
     Pair* Clone(){
-        if(value == nullptr){
-            return new Pair("", nullptr);
-        }
         return new Pair(this->key, value->Clone());
     }
     Pair(){
@@ -41,7 +35,7 @@ struct Pair{
         this->value = value;
     }
     ~Pair(){
-        delete this->value;
+        // delete this->value;
     }
 };
 
@@ -53,7 +47,6 @@ class Objects : public Rooter{
     virtual void shrink() = 0;
     public:
     size_t Size();
-    virtual void print(std::ostream&,int pass) = 0;
     virtual Objects* Clone() = 0;
     virtual ~Objects() {}
 };
@@ -69,9 +62,7 @@ class jsonObject : public Objects{
     jsonObject();
     jsonObject(jsonObject&);
     Objects* Clone() override ;
-    void print(std::ostream&,int pass) override;
-
-
+ 
     void AddPair(Pair * pair);
     void AddPair(std::string key, Values* value);
     
@@ -93,7 +84,6 @@ class jsonArray : public Objects{
     jsonArray();
     jsonArray(jsonArray&);
     Objects* Clone() override;
-    void print(std::ostream&,int pass) override;
 
     int AddValue(Values* value);
     Values* ReturnValue(unsigned int index);
@@ -112,8 +102,6 @@ enum ValueType{
     notFound = -1
 };
 
-// ValueType TypeOfValue(Values* val);
-// ValueType TypeOfObject(Objects* obj);
 
 class vObject : public Values{
     protected:
@@ -124,7 +112,6 @@ class vObject : public Values{
     int setData(void*) override ;
     int removeData(unsigned int) override;
     void* getData(unsigned int) override;
-    void print(std::ostream&,int pass) override;
 
     vObject();
     vObject(jsonObject);
@@ -133,7 +120,6 @@ class vObject : public Values{
     vObject(double*);
     ~vObject() override;
 };
-
 
 class vArray : public Values{
     protected:
@@ -144,14 +130,12 @@ class vArray : public Values{
     int setData(void*) override ;
     int removeData(unsigned int) override;
     void* getData(unsigned int) override;
-    void print(std::ostream&,int pass) override;
 
     vArray();
     vArray(vArray&);
     vArray(jsonArray*);
     vArray(jsonArray);
     ~vArray() override;
-
 };
 
 class vString : public Values{
@@ -163,7 +147,6 @@ class vString : public Values{
     int setData(void*) override ;
     int removeData(unsigned int) override;
     void* getData(unsigned int) override;
-    void print(std::ostream&,int pass) override;
 
     vString();
     vString(vString&);
@@ -181,7 +164,6 @@ class vNumber : public Values{
     int setData(void*) override ;
     int removeData(unsigned int) override;
     void* getData(unsigned int) override;
-    void print(std::ostream&,int pass) override;
 
     vNumber();
     vNumber(vNumber&);
@@ -199,7 +181,6 @@ class vBoolean : public Values{
     int setData(void*) override ;
     int removeData(unsigned int) override;
     void* getData(unsigned int) override;
-    void print(std::ostream&,int pass) override;
 
   
     vBoolean();

@@ -43,11 +43,15 @@ std::vector<std::string> splitString(std::string s, std::string splitter = " "){
 int help(){
     std::cout << "\x1B[32m\t" << "help" << "\033[0m" << " - shows you functions" << std::endl;
     std::cout << "\x1B[32m\t" << "open \x1B[96m{files-path}" << "\033[0m" << " - opens json file" << std::endl;
-    std::cout << "\x1B[32m\t" << "data" << "\033[0m" << " - display currently load data" << std::endl;
+   
     std::cout << "\x1B[32m\t" << "save" << "\033[0m" << " - saves currently opened  file" << std::endl;
     std::cout << "\x1B[32m\t" << "saveas \x1B[96m{files-path}" << "\033[0m" << " - saves currently opened file as new file" << std::endl;
     std::cout << "\x1B[32m\t" << "close" << "\033[0m" << " - closes currently opened file" << std::endl;
-    std::cout << "\x1B[32m\t" << "exit" << "\033[0m" << " - exits program" << std::endl;
+    std::cout << "\x1B[32m\t" << "create \x1B[96m{path/to/key} \x1B[96m{value}" << "\033[0m" << " - creates a new key-value pair" << std::endl;
+    std::cout << "\x1B[32m\t" << "delete \x1B[96m{path/to/key}" << "\033[0m" << " - deletes pair" << std::endl;
+    std::cout << "\x1B[32m\t" << "move \x1B[96m{from} \x1B[96m{to}" << "\033[0m" << " - moves pair" << std::endl;
+    std::cout << "\x1B[32m\t" << "print" << "\033[0m" << " - display currently load data" << std::endl;
+    std::cout << "\x1B[32m\t" << "validate" << "\033[0m" << " - validates the currently opened file" << std::endl;
     return 0;
 }
 
@@ -124,8 +128,6 @@ int set(std::string key, std::string value){
         Pair* p = ds.SearchForKey(newKey);
         if(p->key != ""){
             
-            // std::cout << p->key <<":";
-            // p->value->print(std::cout, 0);
             delete p->value;
             p->value = new vString(value);
             Messenger::LogInfo("Set successful!");
@@ -142,12 +144,10 @@ int set(std::string key, std::string value){
 
         Pair* p = ds.SearchForKey(keysplit);
         if(p->key != ""){
-            // std::cout << p->key <<":";
 
             delete p->value;
             p->value = new vString(value);
             Messenger::LogInfo("Set successful!");
-            // p->value->print(std::cout, 0);
         }else{
             Messenger::LogInfo("Element not found: ", key);
             return 1;

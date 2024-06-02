@@ -4,22 +4,17 @@
 - [ ] Main functionality
     - [x] opening files
     - [X] fix tree data passing for array ( getData() )
-<<<<<<< HEAD
-    - [ ] validation
-    - [ ] saving data in tree
-=======
-    - [ ] Implement data input
-      - [ ] validation
-      - [ ] saving data in tree
->>>>>>> ef3b8f5c341fa6a0119db4c8a25910d33bd423f5
-    - [ ] manipulating data
-    - [ ] display data in good way "pretty"
+    - [X] Implement data input
+      - [X] validation
+      - [X] saving data in tree
+    - [X] manipulating data
+    - [X] display data in good way "pretty"
 - [ ] Unit testing
-    - [X] Check out library
+    - [ ] Check out library (404 lost in work)
     - [ ] save data
     - [ ] manipulation
-- [ ] Examples
-- [ ] Documentation
+- [X] Examples
+- [X] Documentation
 
 simple fixes:
 - [ ] fix the file system to name with spaces
