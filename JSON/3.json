@@ -1,9 +1,11 @@
 {
 	"doge":1,
 	"cat":"2",
-	"lol":{ "asd":1,
-			"cast":{
+	"lol":{
+			"asd":1,
+"cast":{
 				"r":1
-			}},
+			}
+		},
 	"uwu":"cat"
 }

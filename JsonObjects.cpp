@@ -1,5 +1,6 @@
 #include "JsonObjects.h"
 #include <ostream>
+#include <string>
 
 
 
@@ -45,7 +46,7 @@ void* vNumber::getData(unsigned int index =0 ){
 }
 vNumber::~vNumber(){
     // if(this->value != nullptr){
-        // delete this->value;
+        delete this->value;
         // std::cout << "deleted";
     // }
 }
@@ -59,6 +60,9 @@ void vString::print(std::ostream& os,int pass){
 }
 vString::vString(){
     this->value = new std::string("");
+}
+vString::vString(vString& data){
+    this->value = new std::string(*data.value);
 }
 vString::vString(std::string * data){
     this->setData(data);
@@ -121,13 +125,14 @@ void* vBoolean::getData(unsigned int index =0 ){
     return (void*)this->value;
 }
 vBoolean::~vBoolean(){
-    delete this->value;
+    // delete this->value;
+    //unneccessery because it points to 0 or 1 in ram
 }
 
 //=========== Object Value
 
 Values* vObject::Clone(){
-    return new vObject(this->value);
+    return new vObject((jsonObject*)this->value);
 }
 void vObject::print(std::ostream& os,int pass = 0){
     this->value->print(os,pass);
@@ -136,10 +141,13 @@ vObject::vObject(){
     this->value = new jsonObject();
 }
 vObject::vObject(jsonObject * data){
-    this->value = data;
+    this->value = (jsonObject*)data->Clone();
 }
 vObject::vObject(jsonObject data){
     this->value = (jsonObject*)data.Clone();
+}
+vObject::vObject(vObject& other){
+    this->value = (jsonObject*)other.value->Clone();
 }
 int vObject::setData(void* data){
     if(this->value != nullptr){
@@ -229,36 +237,20 @@ ValueType typeOfObject(Objects* obj){
     return notFound;
 }
 void jsonObject::print(std::ostream& os,int pass =0){
-    os << "{";
-    std::cout <<Size();
-    for(int i = 0;i< this->Size();i++){
-        os << pairs[i]->key << ":";
-        // os << typeOfValue(pairs[i]->value);
-        pairs[i]->value->print(os,pass+1);
-        // switch(typeOfValue(pairs[i]->value)){
-        //     case eString:
-        //     // ((vString*)pairs[i]->value)->print(os);
-        //     break;
-        //     // case eNumber:
-        //     // // ((vNumber*)pairs[i]->value)->print(os);
-        //     // break;
-        //     // case eObject:
-        //     // ((vObject*)pairs[i]->value)->print(os);
-        //     // break;   
-        //     // case eArray:
-        //     // ((vArray*)pairs[i]->value)->print(os);
-        //     // break;   
-        //     // case eBoolean:
-        //     // ((vBoolean*)pairs[i]->value)->print(os);
-        //     // break;
-        //     default:
-        //     std::cout << "cannot parse value!";
-        //     break;
-
-
-        // }
-        if(i != this->Size()-1) os << ",";
+    if(pass >0){
+        os << std::string(pass-1,'\t');
     }
+    os << "{\n";
+    // std::cout <<Size();
+    for(int i = 0;i< this->Size();i++){
+    os << std::string(pass+1,'\t');
+        
+        os << pairs[i]->key << ":";
+        pairs[i]->value->print(os,pass+1);
+        if(i != this->Size()-1) os << ",\n";
+    }
+    os<< "\n";
+    os << std::string(pass,'\t');
     os << "}";
 }
 jsonObject::jsonObject(jsonObject& obj){
@@ -292,11 +284,23 @@ void jsonObject::shrink(){
     return;
 }
 Objects* jsonObject::Clone() {
-    return new jsonObject(*this);
+    Pair **ps = new Pair*[this->Size()];
+    for(int i = 0;i<this->Size();i++){
+        ps[i] = pairs[i]->Clone();
+        // std::cout << ps[0]->key;
+    }
+    jsonObject *toReturn = new jsonObject();
+    toReturn->pairs = ps;
+    toReturn->size = this->Size();
+    // std::cout << ps[0]->key;
+    // std::cout << toReturn->pairs[0]->key;
+    // std::cout <<ps[0]->key;
+    // std::cout << Size();
+    return toReturn;
 }
 void jsonObject::AddPair(Pair* pair){
     expand();
-    this->pairs[this->Size()-1] = pair;
+    this->pairs[this->Size()-1] = pair->Clone();
 }
 void jsonObject::AddPair(std::string key, Values* value){
     this->AddPair(new Pair(key, value));    
@@ -345,10 +349,10 @@ int jsonObject::RemovePair(unsigned int index){
 
 }
 jsonObject::~jsonObject(){
-    // ! [] segementaion fault
-    // for(int i =0;i<this->Size();i++){
-    //     delete this->pairs[i]->value;
-    // }
+    for(int i =0;i<this->Size();i++){
+        // std::cout << "deleting" << this->pairs[i]->key;
+        delete this->pairs[i]->value;
+    }
     delete [] this->pairs;
 }
 

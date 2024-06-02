@@ -2,6 +2,7 @@
 #include "JsonObjects.h"
 #include "Rooter.h"
 #include <cerrno>
+#include <iterator>
 #include <ostream>
 #include <sstream>
 #include <fstream>
@@ -9,6 +10,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 //https://stackoverflow.com/questions/4053837/colorizing-text-in-the-console-with-c
 class Messenger{
@@ -72,7 +74,6 @@ class JsonParser{ //privessly called datasave
     //number
     //whitespace
 
-    Objects *root;
     //validates if string is capable of being key or value
     bool validateString(std::string str){
         int quotesNumber = 0;
@@ -122,22 +123,33 @@ class JsonParser{ //privessly called datasave
         return notFound;
     }
 
-    bool generateTree(Objects* _currentObj, std::string key, std::string value ){
-        return true;
-    }
     bool soloData = false;
+    Objects *root;
     Values *globalTemp;
     bool ValidateJson(Objects *_currentObj = nullptr , int _line = 1, int _index = 0, bool _toReturn = false,int pass = 0,bool expectedObject = false){
-        // std::cout << "trie";
-        //object current
-        
-        Objects *currentOBJ;
+        if(!src.is_open())
+        {
+            Messenger::LogError("No file open");
+            return false;
+        }
+        std::vector<std::string> Foundkeys;
+        if(data.size() ==0) {
+            Messenger::LogError("No file opened");
+            return 0;
+        }
+        Objects *currentOBJ = nullptr;
+        if(_line ==1){
+            delete root;
+            root = NULL;
+        }
+        // free(root);
+        soloData = false;
         currentOBJ = _currentObj;
         bool inValue;
         bool inKey;
-        std::string key;
-        std::string value;
-        std::string currentLine;
+        std::string key = "";
+        std::string value = "";
+        std::string currentLine= "";
         int line = _line;
 
         bool inObject = false;
@@ -160,8 +172,6 @@ class JsonParser{ //privessly called datasave
 
         }else {
             
-            delete root;
-            root = new jsonObject();
             if(data[0] != '{' && data[0] !='['){
                 inValue= true;
                 _index++;
@@ -170,14 +180,16 @@ class JsonParser{ //privessly called datasave
                 
             }else{
                 if(data[0] == '{'){
+                    delete root;
                     root = new jsonObject();
                 }else{
+                    delete root;
                     root = new jsonArray();
                 }
             }
             currentOBJ = root;
         }
-     
+        
         for(int i =_index;i<data.size();i++){
         
             switch(data[i]){
@@ -186,7 +198,6 @@ class JsonParser{ //privessly called datasave
                 break;
 
                 case '{':
-                    
                     if(ignore == true){
                         ignoreIncoming++;
                         break;
@@ -207,8 +218,6 @@ class JsonParser{ //privessly called datasave
                         inValue = false;
                         ignoreIncoming = 2;
                         if(key.size()>0){
-                            std::cout << "this thing" << key;   
-                            // std::cout << pass<<" "<<key << ":\n";
                              if(!validateString(key) || !validateString(value))
 
                             {
@@ -216,15 +225,14 @@ class JsonParser{ //privessly called datasave
                                 Messenger::LogInfo("line", std::to_string(line));
                                 return false;
                             } 
-                            std::cout <<std::string(pass,'\t');
                             ValueType vt = typeOfObject(currentOBJ);
+                            
                             switch(vt){
                                 case eObject:
                                     if(true){
-                                        // std::cout << "creating object";
                                         jsonObject *toPass = new jsonObject(); 
-                                        ((jsonObject*)currentOBJ)->AddPair(key,new vObject(toPass));
                                         bool temp = ValidateJson(toPass,line, i,true,pass+1);
+                                        ((jsonObject*)currentOBJ)->AddPair(key,new vObject(toPass));
                                         if(!temp) return temp;
 
                                     }
@@ -245,9 +253,6 @@ class JsonParser{ //privessly called datasave
                         expectKey = true;   
                         inValue = false;
                     }
-                    std::cout <<std::string(pass,'\t');
-
-                    std::cout << pass<<"{\n";
                     
                    
                 
@@ -260,7 +265,6 @@ class JsonParser{ //privessly called datasave
                     if(ignore) break;
                      
                     if(key.size()>0){
-                        std::cout << "this things:: " <<key;
                             if(!validateString(key) || !validateString(value))
                             {
                                 Messenger::LogError("Parsing multiple strings as key or value");
@@ -290,6 +294,7 @@ class JsonParser{ //privessly called datasave
                                             break;
                                         }
                                         ((jsonObject*)currentOBJ)->AddPair(key,v);
+                                        
                                     }
                                 break;
                                 case eArray:
@@ -302,8 +307,10 @@ class JsonParser{ //privessly called datasave
                         key = ""; value = "";
                     }  
                     if(justReturned == false){
-                        std::cout <<std::string(pass,'\t');
-                        std::cout <<pass<<"}\n";
+
+                        // *used when displaying data while testing validator
+                        // ::cout <<std::string(pass,'\t');
+                        // std::cout <<pass<<"}\n"; 
                     }
                     justReturned = false;
                     if(_toReturn) return true;
@@ -324,6 +331,7 @@ class JsonParser{ //privessly called datasave
                         Messenger::LogInfo("line", std::to_string(line));
                         return false;
                     }
+                    Foundkeys.push_back(key);
 
                     inKey = false;
                     inValue = true;
@@ -332,7 +340,7 @@ class JsonParser{ //privessly called datasave
                     
                 break;
                 case ',':
-                    std::cout << "founded this";
+                    // std::cout << "founded `this";
                     if(ignoreCommingArray) break;
                     if(ignore) break;
                     if(inKey){
@@ -355,7 +363,6 @@ class JsonParser{ //privessly called datasave
                             } 
                         
                         
-                        std::cout <<std::string(pass,'\t');
                         switch(typeOfObject(currentOBJ)){
                             case eObject:
                             if(true){
@@ -363,7 +370,6 @@ class JsonParser{ //privessly called datasave
                                  switch(defineValueString(value,line)){
                                             case eString:
                                             v= new vString(value);
-                                            std::cout << *(std::string*)v->getData();
                                             break;
                                             case eNumber:
                                             v = new vNumber(std::stod(value));
@@ -378,24 +384,26 @@ class JsonParser{ //privessly called datasave
                                             break;
                                     }
                                 ((jsonObject*)currentOBJ)->AddPair(key,v);
-                                 std::cout << key <<" : " << value;
+                                //  std::cout << key <<" : " << value;
                             }
                             break;
                             case eArray:
                             break;
                         }
-                        std::cout <<pass << " "<< key << ":" << value << "";
+                        // std::cout <<pass << " "<< key << ":" << value << "";
                         key = ""; value = "";
                     }
                     if(inArray){expectingNewElement = true;}
                     else {expectingNewKey = true;}
 
-                    std::cout << pass<<",\n";
+                    // std::cout << pass<<",\n";
                     inKey = true;
                     inValue = false;
                   
                 break;
                 case '[':
+                    // TODO: IMPLEMENT...
+
                     // if(ignore) break;
                     // if(key.size() > 0){
                     //     std::cout <<pass<< key << ":";
@@ -447,8 +455,20 @@ class JsonParser{ //privessly called datasave
                 return false;
                 break;
             }
-            // std::cout << value;
         }
+        // std::cout << Foundkeys.size();
+        for(int i =0 ;i <Foundkeys.size()-1;i++){
+            for(int j=i+1; j<Foundkeys.size();j++){
+                if(Foundkeys[i] == Foundkeys[j]){
+                    Messenger::LogError("Multiple keys with the same name");
+                    delete root;
+                    root = nullptr;
+                    return false;
+                } 
+            }
+        }
+
+
 
         return true;
     }
@@ -471,23 +491,7 @@ class JsonParser{ //privessly called datasave
     bool _displayTree(){
         std::cout << "displaying tree" << std::endl;
         ((jsonObject*)root)->print(std::cout, 0);
-        // jsonObject *jo = new jsonObject();
-        // jo->AddPair("asd", new vNumber(12));
-        // jo->AddPair("asd", new vNumber(12));
-        // jo->print(std::cout);
-        // root = new jsonObject();
-        // ((jsonObject*)root)->AddPair("key", new vString("\"cat\""));
-        // root->print(std::cout);
-        // std::cout << typeOfObject(root);
-        // root = new jsonObject();
-        // jsonObject *jo = new jsonObject();
-        // jo->AddPair("nutss",new vString("lol"));
-        // ((jsonObject*)root)->AddPair(new Pair("cat",new vObject(jo)));
-        // ((jsonObject*)root)->AddPair(new Pair("val",new vString("nut")));
-        // ((jsonObject*)root)->AddPair(new Pair("key",new vNumber(12)));
-        // // std::cout << *(double*)((jsonObject*)root)->ReturnPair("key")->value->getData();
-        // root->print(std::cout);
-        // jo->print(std::cout);
+
         return 0;
     }
 
@@ -510,47 +514,206 @@ class JsonParser{ //privessly called datasave
         Messenger::LogInfo("Opened:", file);
         fileName = file;
         LoadFile();
-        std::cout << data;
         return 0;
     }
+    int count;
     int DisplayTree(){
+        
+
         if(soloData){
             globalTemp->print(std::cout,0);    
             return 0;
         }
+        if(root == nullptr){
+            Messenger::LogError("First use \"validate\" before printing");
+            return 0;
+        }
         return _displayTree();
+
         return 0;
     }
-    int displayData(){
-        // std::cout << data <<std::endl;
-        //GenerateDataTree();
-       // validateJson();
-        if(root !=nullptr){
-            // delete root;
-            root = nullptr;
+    int validateData(){
+
+        return ValidateJson(root);
+   
+        return 0;
+    }
+    bool isValidated(bool display = true){
+        if(root == nullptr){
+            if(display == true)Messenger::LogError("Need to validate data before modifying");
+            return false;
         }
+        return true;
+    }
+    
+    Pair* SearchForKey(std::string key, Objects* _currentObj= nullptr){
+        if(!isValidated())return new Pair("",nullptr);
+        if(_currentObj == nullptr) _currentObj = root;
+        for(int i= 0;i<_currentObj->Size();i++){
+            Pair* p = ((jsonObject*)_currentObj)->ReturnPair(i);
+            if(p->key == key){
+                return p;
+            }
+            if(typeOfValue(p->value)==eObject){
+                jsonObject* cur = (jsonObject*)((vObject*)(p->value))->getData(0); 
+                Pair* temp = SearchForKey(key,cur);
+                if(temp->key != "") return temp;
+            }
+        }
+        return new Pair("", nullptr);
+    }
+      Pair* SearchForKey(std::vector<std::string> key,int index= 0, Objects* _currentObj= nullptr){
+        if(!isValidated())return new Pair("",nullptr);
       
-        // if(root == nullptr && open >1){
-            // std::cout << "null";
-            // return 0;
-        // }else{
-            return ValidateJson(root);
-        // }
-        
+        if(_currentObj == nullptr) _currentObj = root;
+        for(int i= 0;i<_currentObj->Size();i++){
+            Pair* p = ((jsonObject*)_currentObj)->ReturnPair(i);
+            
+            if(p->key == key[index] ){
+                if (index == key.size()-1) return p;
+                if(typeOfValue(p->value)==eObject){
+                    jsonObject* cur = (jsonObject*)((vObject*)(p->value))->getData(0); 
+                    Pair* temp = SearchForKey(key,index+1,cur);
+                    if(temp->key != "") return temp;
+                }
+            }
+        }
+        return new Pair("", nullptr);
+    }
+    int removePair(std::string key, Objects* _currentObj= nullptr){
+        if(!isValidated())return 1;
+        if(_currentObj == nullptr) _currentObj = root;
+        for(int i= 0;i<_currentObj->Size();i++){
+            Pair* p = ((jsonObject*)_currentObj)->ReturnPair(i);
+            if(p->key == key){
+                 ((jsonObject*)_currentObj)->RemovePair(key);
+                
+                return 0;
+            }
+            if(typeOfValue(p->value)==eObject){
+                jsonObject* cur = (jsonObject*)((vObject*)(p->value))->getData(0); 
+                Pair* temp = SearchForKey(key,cur);
+                if(temp->key != "") return 0;
+            }
+        }
+        return 1;
+    }
+    int removePair(std::vector<std::string> key,int index= 0, Objects* _currentObj= nullptr){
+     
+        if(!isValidated())return 1;
+          if(_currentObj == nullptr) _currentObj = root;
+        for(int i= 0;i<_currentObj->Size();i++){
+            Pair* p = ((jsonObject*)_currentObj)->ReturnPair(i);
+            
+            if(p->key == key[index] ){
+                if (index == key.size()-1) {
+                    ((jsonObject*)_currentObj)->RemovePair(key[index]);
+                    return 0;
+                }
+                if(typeOfValue(p->value)==eObject){
+                    jsonObject* cur = (jsonObject*)((vObject*)(p->value))->getData(0);
+                    int temp = removePair(key,index+1,cur);
+                    if(temp == 0) return 0;
+                }
+            }
+        }
+        return 1;
     }
 
+    int addPair(std::string key,std::string value, Objects* _currentObj= nullptr){
+        if(!isValidated())return 1;
+        if(_currentObj == nullptr) _currentObj = root;
+        for(int i= 0;i<_currentObj->Size();i++){
+            Pair* p = ((jsonObject*)_currentObj)->ReturnPair(i);
+            if(p->key == key){
+                return 1;
+            }
+        }
+        ((jsonObject*)_currentObj)->AddPair(key, new vString(value));
+        return 0;
+    }
+     int addPair(std::vector<std::string> key,std::string value,int index =0, Objects* _currentObj= nullptr){
+        if(!isValidated())return 1;
+          if(_currentObj == nullptr) _currentObj = root;
+          Pair *p;
+            for(int i= 0;i<_currentObj->Size();i++){
+            p = ((jsonObject*)_currentObj)->ReturnPair(i);
+            
+            if(p->key == key[index] ){
+                if (index == key.size()-1) {
+                    Messenger::LogError("Key already exist");
+                    return -1;
+                }
+                if(typeOfValue(p->value)==eObject){
+                    jsonObject* cur = (jsonObject*)((vObject*)(p->value))->getData(0);
+                    int temp = addPair(key,value,index+1,cur);
+                    if(temp == -1) return 1;
+                    else{
+                        if(index == key.size()-2){
+                            ((jsonObject*)cur)->AddPair(key[index+1],new vString(value));
+                           return 0;
+
+                        }
+                    }
+                }
+            }
+            }   
+        
+        return 1;
+    }
+       int movePair(std::vector<std::string> key,std::vector<std::string> to,Pair* p= nullptr,int index =0, Objects* _currentObj= nullptr){
+        if(!isValidated())return 1;
+        if(_currentObj ==nullptr) _currentObj = root;
+        
+
+        p = SearchForKey(key)->Clone();
+        if(p->key == "") return -1;
+        if(to.capacity() == 0){
+            removePair(key);
+            ((jsonObject*)_currentObj)->AddPair(p);
+            delete p;
+            return 0;
+        }else{  
+                Pair* pair = SearchForKey("\"" +to[to.size()-1]+ "\"");
+                if(typeOfValue(pair->value) == eObject){
+                    ((jsonObject*)pair->value->getData())->AddPair(p);
+                    removePair(key);                
+                }else{
+                    delete p;
+                    return 1;
+
+                }
+               
+
+                // delete pair; // dont delete because is reference
+            return 0;
+        }
+        delete p;
+        
+        return 1;
+    }
     //https://stackoverflow.com/questions/53359727/how-to-save-and-also-read-c-fstream-file-without-closing-it  
     int saveFile(){  
+        if(!isValidated()){
+            return 0;
+        };
         if(!src.is_open()){
             Messenger::LogError("No file currently opened");
             return -1;
 
-        } 
-        src.flush();
+        }
+        src.close();
+        src.open(fileName, std::ofstream::out | std::ofstream::trunc);
+        root->print(src, 0);
+        src.close();
+        openFile(fileName);
+        // src.flush();
         Messenger::LogInfo("Successful saved.");
         return 0;
     }
     int saveAsFile(std::string file){  
+        if(!isValidated())return false;
+
         std::ofstream output;
         Messenger::LogInfo("Saving data to:", file);
         output.open(file, std::ios::out);
@@ -558,23 +721,27 @@ class JsonParser{ //privessly called datasave
             Messenger::LogError("File failed to open");
             return 1;
         }
-        output << src.rdbuf();
+        root->print(output, 0);
+        // output << src.rdbuf();
         output.close();
         Messenger::LogInfo("Successful saved.");
         return 0;
     }
     
-    int closeFile(bool displayError = true){   
+    int closeFile(bool displayError = true){
+
         if(!src.is_open() && displayError){
             Messenger::LogError("No file currently opened");
             return -1;
         } 
         if(src.is_open()){
-            
-            // delete root;
+            // root = nullptr;
+            delete root;
+            root = NULL;
             src.close();
             Messenger::LogInfo("Closed file", fileName);
             fileName = "";
+            std::cout << (root==NULL);
         }
         return 0;
     }

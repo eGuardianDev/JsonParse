@@ -22,10 +22,12 @@ class Values : public Rooter{
     virtual ~Values() {};
 };
 struct Pair{
-    public:
     std::string key;
     Values *value;
     Pair* Clone(){
+        if(value == nullptr){
+            return new Pair("", nullptr);
+        }
         return new Pair(this->key, value->Clone());
     }
     Pair(){
@@ -132,6 +134,7 @@ class vObject : public Values{
     ~vObject() override;
 };
 
+
 class vArray : public Values{
     protected:
     jsonArray *value;
@@ -148,6 +151,7 @@ class vArray : public Values{
     vArray(jsonArray*);
     vArray(jsonArray);
     ~vArray() override;
+
 };
 
 class vString : public Values{

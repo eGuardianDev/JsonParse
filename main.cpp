@@ -17,25 +17,13 @@ int conversionCmd(std::string str){
     if(str == "exit") return eexit;
     if(str == "print") return eprint;
     if(str == "validate") return evalidate;
+    if(str == "search") return efind;
+    if(str == "set") return emodify;
+    if(str == "create") return ecreate;
+    if(str == "delete") return edelete;
+    if(str == "move") return emove;
     return -1;
 }
-// implementation https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
-std::vector<std::string> splitString(std::string s, std::string splitter = " "){
-    if(s.size() <= 0){ return std::vector<std::string>();}
-    std::string delimiter = splitter;
-    std::vector<std::string> arr;
-
-    size_t pos = 0;
-    std::string token;
-    while ((pos = s.find(delimiter)) != std::string::npos) {
-        token = s.substr(0, pos);
-        arr.push_back(token);
-        s.erase(0, pos + delimiter.length());
-    }
-    arr.push_back(s);
-    return arr;
-}
-
 
 int main(){
 
@@ -83,6 +71,45 @@ int main(){
                 break;
             case eclose:
                 close();
+            break;
+            case efind:
+                if(cmdSplit.size() != 2 ){
+                    Messenger::LogError("This function takes one argument");
+                    break;
+                }
+                search(cmdSplit[1]);
+            break;
+            case emodify:
+                 if(cmdSplit.size() != 3 ){
+                    Messenger::LogError("This function takes two argument");
+                    break;
+                }
+                set(cmdSplit[1],cmdSplit[2]);
+            break;
+            case ecreate:
+              if(cmdSplit.size() != 3 ){
+                    Messenger::LogError("This function takes two argument");
+                    break;
+                }
+                create(cmdSplit[1],cmdSplit[2]);
+            break; 
+            case emove:
+              if(cmdSplit.size() ==2){
+                    move(cmdSplit[1],"");
+                }else if(cmdSplit.size() == 3){
+                    move(cmdSplit[1],cmdSplit[2]);
+
+                }else{
+                       Messenger::LogError("This function takes one or two argument");
+                 break;
+                }
+            break;
+            case edelete:
+                if(cmdSplit.size() != 2 ){
+                    Messenger::LogError("This function takes one argument");
+                    break;
+                }
+                _delete(cmdSplit[1]);
             break;
             case eexit:
                 exit();
