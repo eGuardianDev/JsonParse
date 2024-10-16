@@ -28,7 +28,8 @@ simple fixes:
 - Concepts/test2.cpp - void casting 
 
 
-
+- please check one version before 16.10.2024
+- may cause problem in version 16.10.2024
 
 #### Helpful links:
 - the schematics of the JSON Parser [here](https://www.json.org/json-en.html)
